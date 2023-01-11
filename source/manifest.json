@@ -1,16 +1,10 @@
 {
-	"name": "Awesome Extension",
-	"version": "0.0.0",
-	"description": "An awesome new browser extension",
-	"homepage_url": "https://github.com/fregante/browser-extension-template",
+	"name": "saml-download",
+	"version": "1.0.1",
+	"description": "Downloads to file the first saml response in a tab that connects to an url ending in SAMLDOWNLOAD",
+	"homepage_url": "https://github.com/JoseD92/saml-download",
 	"manifest_version": 2,
 	"minimum_chrome_version": "100",
-	"browser_specific_settings": {
-		"gecko": {
-			"id": "awesome-extension@notlmn.github.io",
-			"strict_min_version": "100.0"
-		}
-	},
 	"permissions": [
 		"webNavigation",
 		"webRequest",
