@@ -9,11 +9,21 @@ function downloadAndClose(data: string, tabId: number) {
     };
     chrome.downloads.onChanged.addListener(onChanged);
 
-    let jsonBlob = new Blob( [data], { type : "application/json" });
-    let objectURL = window.URL.createObjectURL(jsonBlob);
-    chrome.downloads.download({ url: objectURL, filename: "saml.txt", saveAs: false }, (id) => {
-        downloadId = id;
-    });
+    chrome.offscreen.createDocument({
+        url: chrome.runtime.getURL("offscreen.html"),
+        reasons: [chrome.offscreen.Reason.BLOBS],
+        justification: "download saml payload.",
+      }, () => {
+            chrome.runtime.sendMessage({ data: data}, (response) => {
+                const url = response.url;
+                chrome.downloads.download({ url: url, filename: "saml.txt", saveAs: false }, (id) => {
+                    downloadId = id;
+                    chrome.offscreen.closeDocument();
+                });
+            });
+        }
+    );
+    
 }
 
 function addTabListener(details: chrome.webRequest.WebRequestBodyDetails) {
@@ -49,5 +59,5 @@ function addTabListener(details: chrome.webRequest.WebRequestBodyDetails) {
 chrome.webRequest.onBeforeRequest.addListener(
     addTabListener,
     {urls: ["*://*/*SAMLDOWNLOAD"]},
-    ["blocking"]
+    []
   );

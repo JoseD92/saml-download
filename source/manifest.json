@@ -3,18 +3,34 @@
 	"version": "1.0.1",
 	"description": "Downloads to file the first saml response in a tab that connects to an url ending in SAMLDOWNLOAD",
 	"homepage_url": "https://github.com/JoseD92/saml-download",
-	"manifest_version": 2,
+	"manifest_version": 3,
 	"minimum_chrome_version": "100",
 	"permissions": [
 		"webNavigation",
-		"webRequest",
-		"webRequestBlocking",
-		"http://*/*",
-		"https://*/*",
 		"downloads",
-		"tabs"
+		"tabs",
+		"webRequest",
+		"declarativeNetRequest",
+		"offscreen"
+	],
+	"declarative_net_request" : {
+		"rule_resources" : [{
+		  "id": "track_saml",
+		  "enabled": true,
+		  "path": "rules.json"
+		}]
+	  },
+	"host_permissions": [
+		"https://*/*"
 	],
 	"background": {
-		"scripts": ["background.ts"]
-	}
+		"service_worker": "background.ts",
+		"type": "module"
+	},
+	"web_accessible_resources": [{
+		"matches": ["<all_urls>"],
+		"resources": ["offscreen.html"],
+		"use_dynamic_url": true
+	  }]
+	  
 }
