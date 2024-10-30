@@ -1,4 +1,7 @@
 function downloadAndClose(data: string, tabId: number) {
+    if (typeof data === 'undefined' || typeof tabId === 'undefined') {
+        throw new Error('Either data or tabId is undefined, this is bad!');
+    }
     let downloadId;
 
     function onChanged(delta: chrome.downloads.DownloadDelta) {
@@ -9,12 +12,20 @@ function downloadAndClose(data: string, tabId: number) {
     };
     chrome.downloads.onChanged.addListener(onChanged);
 
+    console.log('Offscreen page at:' + chrome.runtime.getURL("offscreen.html"));
+    
     chrome.offscreen.createDocument({
-        url: chrome.runtime.getURL("offscreen.html"),
+        url: "offscreen.html", // used to worked with chrome.runtime.getURL("offscreen.html")
         reasons: [chrome.offscreen.Reason.BLOBS],
         justification: "download saml payload.",
-      }, () => {
-            chrome.runtime.sendMessage({ data: data}, (response) => {
+    }, () => {
+            chrome.runtime.sendMessage({ data: data }, (response) => {
+                if (typeof response === 'undefined') {
+                    throw new Error('Response is undefined, this is bad!');
+                }
+                if (!response.hasOwnProperty('url')) {
+                    throw new Error('Response does not has url, got: ' + response);
+                }
                 const url = response.url;
                 chrome.downloads.download({ url: url, filename: "saml.txt", saveAs: false }, (id) => {
                     downloadId = id;
@@ -23,7 +34,6 @@ function downloadAndClose(data: string, tabId: number) {
             });
         }
     );
-    
 }
 
 function addTabListener(details: chrome.webRequest.WebRequestBodyDetails) {
